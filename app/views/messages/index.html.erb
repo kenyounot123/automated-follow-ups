@@ -1,0 +1,24 @@
+<% content_for :title, "Drafts" %>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-bold tracking-tight">Message drafts</h1>
+  <p class="mt-1 text-sm text-ink-soft">
+    Approving queues delivery. Denying leaves the step available for the next cadence sweep.
+  </p>
+</div>
+
+<%= link_to "Back to replay controls", root_path, class: "mb-6 inline-block text-sm font-semibold text-brand-600 hover:underline" %>
+
+<div id="drafts" class="space-y-3">
+  <%= render @messages %>
+  <% if @messages.empty? %>
+    <p class="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-10 text-center text-sm text-ink-soft">
+      Nothing waiting. New drafts appear here on their own as quotes go cold.
+    </p>
+  <% end %>
+</div>
+
+<% if @recent.any? %>
+  <h2 class="mt-8 mb-3 text-lg font-bold tracking-tight">Recently handled</h2>
+  <div class="space-y-3"><%= render @recent %></div>
+<% end %>

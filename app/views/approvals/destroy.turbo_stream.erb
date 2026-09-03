@@ -1,0 +1,4 @@
+<%= turbo_stream.remove dom_id(@message) %>
+<%= turbo_stream.update "flash" do %>
+  <%= render "shared/flash" %>
+<% end %>
