@@ -1,4 +1,5 @@
 # Automated Follow-Up
+Check out the loom video below for a more visual demo
 
 ## Running the Demo Locally
 
@@ -83,8 +84,8 @@ If drafts do not appear after clicking a control, confirm that the `jobs: bin/jo
 Of the top of my head I jotted things down and just spoke out loud some of my initial thoughts when reading the assignment. I was already familiar with building out some form of automated messaging system based on a 'policy' so I knew what kind of domain concepts and language that would be introduced. I naturally leaned towards a relational db and some web framework with strong CRUD capabilities and chose Ruby on Rails. At first I was not thinking about rails because with the seed file given I thought this would only be an event-processing system. Ultimately I still chose Rails with relational db because there were stateful business rules that needed to be modeled out and entities that naturally needed some relationship with other entities. This allowed me to spin up the demo pretty quickly with AI.
 
 ### Where I stopped...
-I stopped at covering the 
-
+[I stopped at covering the 
+](https://www.loom.com/share/4df9ffb4af31464e9fc00f2885789e71)
 
 ### Scalability
 > what changes when this runs for a parent company with 50 shops, each with their own quotes, phone numbers, and opinions about what "follow up" means?
