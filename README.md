@@ -1,24 +1,68 @@
-# README
+# Automated Follow-Up
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Running the Demo Locally
 
-Things you may want to cover:
+### Prerequisites
 
-* Ruby version
+- Ruby `3.4.9`
+- Bundler
+- SQLite
+- Git
 
-* System dependencies
+### Setup
 
-* Configuration
+From the project directory:
 
-* Database creation
+```bash
+git clone <repository-url>
+cd automated-follow-up
 
-* Database initialization
+bin/setup --skip-server
+bin/rails db:seed
+bin/dev
+```
 
-* How to run the test suite
+`bin/dev` starts the three required processes:
 
-* Services (job queues, cache servers, search engines, etc.)
+- Rails web server
+- Tailwind CSS watcher
+- Background job worker
 
-* Deployment instructions
+Open the demo at:
 
-* ...
+```text
+http://localhost:3000
+```
+
+The background worker must be running because event ingestion and cadence sweeps run asynchronously.
+
+## Demo Flow
+
+1. Open the **Triage** page.
+2. Click **Reset demo**.
+3. Click **Advance 1 day** or **Ingest next event**.
+4. Refresh the page after the worker processes the job.
+5. Review the triage results and generated drafts.
+6. Open **Drafts**.
+7. Approve or deny a draft.
+8. Click **Advance 4 days** to make the next cadence step eligible.
+9. Run another cycle and review the next draft.
+
+The demo uses simulated time, so no real waiting is required.
+
+## Resetting the Demo
+
+To reset only the demo state:
+
+```bash
+bin/rails db:seed
+```
+
+To completely reset the local database:
+
+```bash
+bin/setup --reset
+bin/dev
+```
+
+If drafts do not appear after clicking a control, confirm that the `jobs: bin/jobs` process is still running.
