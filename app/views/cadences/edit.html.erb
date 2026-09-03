@@ -1,0 +1,48 @@
+<% content_for :title, "Cadence" %>
+
+<h1 class="text-2xl font-semibold tracking-tight">Cadence</h1>
+<p class="mt-1 mb-6 text-sm text-ink-soft">
+  The rules deciding whether a quote is worth chasing and when to stop. Timing lives on the steps below.
+</p>
+
+<%= form_with model: @cadence, url: cadence_path, method: :patch, class: "max-w-xl space-y-4" do |f| %>
+  <% [
+       [:min_amount_dollars, "Minimum quote amount", "Quotes below this are never chased.", @cadence.min_amount_cents],
+       [:big_quote_threshold_dollars, "Big quote threshold", "At or above this, silence is treated as urgent.", @cadence.big_quote_amount_cents]
+     ].each do |field, label, hint, cents| %>
+    <div>
+      <%= f.label field, label, class: "block text-sm font-medium" %>
+      <div class="relative mt-1">
+        <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-ink-soft">$</span>
+        <%= f.number_field field, value: format("%.2f", cents / 100.0), min: 0, step: "0.01",
+              class: "w-full rounded-lg border border-slate-300 py-2 pl-7 pr-3 text-sm" %>
+      </div>
+      <p class="mt-1 text-xs text-ink-soft"><%= hint %> Currently <%= money(cents) %>.</p>
+    </div>
+  <% end %>
+  <% {
+       max_age_days:          ["Stop after (days)", "A quote older than this is considered dead."],
+       viewed_recently_hours: ["Recent quote-view window (hours)", "A recent view suggests the customer may still be considering the quote."],
+       stale_contact_days:    ["Stale contact (days)", "No contact for this long counts as going cold."]
+     }.each do |field, (label, hint)| %>
+    <div>
+      <%= f.label field, label, class: "block text-sm font-medium" %>
+      <%= f.number_field field, class: "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" %>
+      <p class="mt-1 text-xs text-ink-soft"><%= hint %></p>
+    </div>
+  <% end %>
+  <%= f.submit "Save", class: "rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700" %>
+<% end %>
+
+<h2 class="mt-10 mb-3 text-lg font-semibold tracking-tight">Steps</h2>
+<ol class="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
+  <% @cadence.steps.each do |step| %>
+    <li class="px-4 py-3 text-sm">
+      <div class="flex items-center gap-3">
+        <span class="font-medium"><%= step.position %>. <%= step.label %></span>
+        <span class="text-ink-soft"><%= step.channel %> &middot; <%= step.delay_hours %>h after the previous touch</span>
+      </div>
+      <p class="mt-1 font-mono text-xs text-ink-soft"><%= step.prompt_template %></p>
+    </li>
+  <% end %>
+</ol>

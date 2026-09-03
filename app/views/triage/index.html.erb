@@ -1,0 +1,137 @@
+<% content_for :title, "Triage" %>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-bold tracking-tight">Follow-up triage</h1>
+  <p class="mt-1 text-sm text-ink-soft">
+    Ranked by how much is at stake and how warm the signal is. Drafts are written automatically; nothing is sent until you approve one.
+  </p>
+</div>
+
+<section class="mb-8 overflow-hidden rounded-2xl border border-brand-100 bg-brand-50">
+  <div class="flex flex-col gap-5 border-b border-brand-100 px-5 py-5 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p class="text-sm font-semibold text-brand-800">Replay lab</p>
+      <h2 class="mt-1 text-xl font-bold tracking-tight text-ink">Walk one real customer journey</h2>
+      <p class="mt-1 max-w-2xl text-sm leading-relaxed text-ink-soft">
+        Move the clock, let events arrive, then watch ingestion, triage, drafting and sending change the queue.
+      </p>
+    </div>
+    <%= button_to "Reset demo", demo_reset_path,
+          class: "shrink-0 rounded-lg border border-brand-200 bg-white px-3 py-2 text-sm font-semibold text-brand-700 hover:bg-brand-100" %>
+  </div>
+
+  <div class="grid gap-4 px-5 py-5 sm:grid-cols-3">
+    <div>
+      <p class="text-xs font-semibold text-brand-800">Simulated time</p>
+      <p class="mt-1 font-semibold text-ink"><%= @demo.now.utc.strftime("%b %-d, %Y · %H:%M UTC") %></p>
+    </div>
+    <div>
+      <p class="text-xs font-semibold text-brand-800">Event stream</p>
+      <p class="mt-1 font-semibold text-ink"><%= @demo.ingested_count %> / <%= @demo.source_count %> events released</p>
+    </div>
+    <div>
+      <p class="text-xs font-semibold text-brand-800">Next event</p>
+      <p class="mt-1 font-semibold text-ink">
+        <% if @demo.next_event %>
+          <%= @demo.next_event.fetch("type").tr("_", " ") %>
+          <span class="font-normal text-ink-soft">· <%= @demo.next_event.fetch("quote_id") %></span>
+        <% else %>
+          Stream complete
+        <% end %>
+      </p>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap gap-2 border-t border-brand-100 bg-white/60 px-5 py-4">
+    <%= button_to "Ingest next event", demo_next_event_path,
+          class: "rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-700" %>
+    <%= button_to "Run cycle now", demo_cycle_path,
+          class: "rounded-lg border border-brand-200 bg-white px-3 py-2 text-sm font-semibold text-brand-700 hover:bg-brand-100" %>
+    <%= button_to "Advance 1 day", demo_advance_path(hours: 24),
+          class: "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-ink-soft hover:bg-slate-50" %>
+    <%= button_to "Advance 4 days", demo_advance_path(hours: 96),
+          class: "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-ink-soft hover:bg-slate-50" %>
+  </div>
+
+  <% recent_events = @account.events.includes(:quote).chronological.last(3).reverse %>
+  <% if recent_events.any? %>
+    <div class="border-t border-brand-100 px-5 py-4">
+      <p class="text-xs font-semibold text-brand-800">Latest activity</p>
+      <div class="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-sm text-ink-soft">
+        <% recent_events.each do |event| %>
+          <span><%= event.event_type.tr("_", " ") %> · <%= event.quote.external_id %></span>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</section>
+
+<% if @pending_count.positive? %>
+  <%= link_to messages_path, class: "mb-6 flex items-center gap-3 rounded-xl bg-brand-600 px-4 py-3 text-sm font-medium text-white hover:bg-brand-700" do %>
+    <span class="rounded-full bg-accent-500 px-2 py-0.5 font-bold text-ink"><%= @pending_count %></span>
+    <%= "draft".pluralize(@pending_count) %> ready for review
+    <span class="ml-auto">Review &rarr;</span>
+  <% end %>
+<% end %>
+
+<section class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+  <table class="w-full text-sm">
+    <thead class="bg-brand-50 text-left text-xs font-semibold uppercase tracking-wide text-brand-800">
+      <tr>
+        <th class="px-4 py-3 font-medium">Quote</th>
+        <th class="px-4 py-3 font-medium">Customer</th>
+        <th class="px-4 py-3 text-right font-medium">Amount</th>
+        <th class="px-4 py-3 font-medium">Why</th>
+        <th class="px-4 py-3 font-medium">Next step</th>
+        <th class="px-4 py-3 font-medium">Last seen</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      <% @queue.each do |candidate| %>
+        <% quote = candidate.quote %>
+        <tr class="hover:bg-slate-50">
+          <td class="px-4 py-3 font-medium">
+            <%= link_to quote.external_id, quote_path(quote), class: "font-semibold text-brand-600 hover:underline" %>
+          </td>
+          <td class="px-4 py-3"><%= quote.customer.name %><span class="text-ink-soft/60"> &middot; <%= quote.tech_name %></span></td>
+          <td class="px-4 py-3 text-right tabular-nums"><%= money(quote.amount_cents) %></td>
+          <td class="px-4 py-3"><%= reason_chip(candidate.reason) %></td>
+          <td class="px-4 py-3 text-ink-soft"><%= candidate.step.label %></td>
+          <td class="px-4 py-3 text-ink-soft">
+            <%= quote.last_viewed_at ? "viewed #{when_ago(quote.last_viewed_at)}" : "never viewed" %>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <% if candidate.message %>
+              <%= link_to "Review &rarr;".html_safe, messages_path, class: "text-xs font-semibold text-brand-600 hover:underline" %>
+            <% else %>
+              <span class="text-xs text-ink-soft">queued</span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+      <% if @queue.empty? %>
+        <tr><td colspan="7" class="px-4 py-8 text-center text-ink-soft">Nothing to follow up on right now.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>
+
+<% if @triage.needs_reply.any? %>
+  <section class="mt-8">
+    <h2 class="text-lg font-bold tracking-tight">Needs a human reply</h2>
+    <p class="mt-1 mb-3 text-sm text-ink-soft">
+      These customers wrote back and nobody answered. A templated nudge is the wrong response, so they are not drafted.
+    </p>
+    <ul class="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <% @triage.needs_reply.each do |quote| %>
+        <li class="flex items-center gap-4 px-4 py-3 text-sm">
+          <%= link_to quote.external_id, quote_path(quote), class: "font-medium font-semibold text-brand-600 hover:underline" %>
+          <span><%= quote.customer.name %></span>
+          <span class="tabular-nums text-ink-soft"><%= money(quote.amount_cents) %></span>
+          <span class="ml-auto text-ink-soft">replied <%= when_ago(quote.last_customer_reply_at) %></span>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+/* Brand palette, sampled from the Robby marketing site. */
+@theme {
+  --color-brand-50:  #EEF2FF;
+  --color-brand-100: #DCE4FE;
+  --color-brand-500: #3A66EC;
+  --color-brand-600: #2151E8;
+  --color-brand-700: #1348E7;
+  --color-brand-800: #113BBC;
+
+  --color-accent-100: #FEF6D6;
+  --color-accent-400: #FBD848;
+  --color-accent-500: #FACC14;
+  --color-accent-600: #E0B505;
+
+  --color-ink:      #101828;
+  --color-ink-soft: #475467;
+}

@@ -1,0 +1,55 @@
+<% content_for :title, @quote.external_id %>
+
+<div class="mb-6">
+  <%= link_to "← Triage", root_path, class: "text-sm text-ink-soft hover:text-brand-600" %>
+  <h1 class="mt-2 flex items-center gap-3 text-2xl font-semibold tracking-tight">
+    <%= @quote.external_id %>
+    <%= status_chip(@quote.status) %>
+  </h1>
+  <p class="mt-1 text-sm text-ink-soft">
+    <%= @quote.customer.name %> &middot; <%= @quote.customer.phone %> &middot;
+    <%= money(@quote.amount_cents) %> &middot; tech <%= @quote.tech_name %>
+  </p>
+</div>
+
+<section class="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+  <% {
+       "Quoted"        => @quote.quoted_at,
+       "Last viewed"   => @quote.last_viewed_at,
+       "Last reply"    => @quote.last_customer_reply_at,
+       "Last outbound" => @quote.last_outbound_at
+     }.each do |label, value| %>
+    <div class="rounded-xl border border-slate-200 bg-white p-3">
+      <div class="text-xs uppercase tracking-wide text-ink-soft"><%= label %></div>
+      <div class="mt-1 text-sm font-medium"><%= value ? value.utc.strftime("%b %-d, %H:%M") : "—" %></div>
+    </div>
+  <% end %>
+</section>
+
+<section class="mb-8 rounded-xl border border-slate-200 bg-white p-4 text-sm">
+  <h2 class="mb-2 font-semibold">Contact history</h2>
+  <dl class="grid grid-cols-1 gap-1 sm:grid-cols-3">
+    <div><dt class="text-ink-soft">Reported by source</dt><dd><%= @quote.reported_last_contact_at&.utc&.strftime("%b %-d, %H:%M") || "—" %></dd></div>
+    <div><dt class="text-ink-soft">Derived from events</dt><dd><%= [@quote.last_customer_reply_at, @quote.last_outbound_at].compact.max&.utc&.strftime("%b %-d, %H:%M") || "—" %></dd></div>
+    <div><dt class="text-ink-soft">Effective</dt><dd class="font-medium"><%= @quote.effective_last_contact_at&.utc&.strftime("%b %-d, %H:%M") || "—" %></dd></div>
+  </dl>
+  <p class="mt-2 text-xs text-ink-soft">
+    The two sources disagree on most quotes: the snapshot records contact this system never saw, the events record what it did. Neither is dropped.
+  </p>
+</section>
+
+<h2 class="mb-3 text-lg font-semibold tracking-tight">Timeline <span class="text-sm font-normal text-ink-soft">(<%= @events.size %> events, stored order independent)</span></h2>
+<ol class="mb-8 divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
+  <% @events.each do |event| %>
+    <li class="flex items-center gap-3 px-4 py-2 text-sm">
+      <span class="w-36 shrink-0 tabular-nums text-ink-soft"><%= event.occurred_at.utc.strftime("%b %-d, %H:%M") %></span>
+      <span class="font-medium"><%= event.event_type.tr("_", " ") %></span>
+      <% if event.channel.present? %><span class="text-ink-soft"><%= event.channel %></span><% end %>
+    </li>
+  <% end %>
+</ol>
+
+<% if @messages.any? %>
+  <h2 class="mb-3 text-lg font-semibold tracking-tight">Follow-ups</h2>
+  <div class="space-y-3"><%= render @messages %></div>
+<% end %>
