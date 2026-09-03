@@ -14,9 +14,9 @@ module ApplicationHelper
     "failed"   => "bg-red-100 text-red-800"
   }.freeze
 
-  def nav_link_to(name, path)
+  def nav_link_to(name, path, **options)
     active = current_page?(path)
-    link_to name, path,
+    link_to name, path, **options,
             class: "rounded-md px-3 py-1.5 font-medium #{active ? "bg-white text-brand-700" : "text-brand-100 hover:bg-brand-500 hover:text-white"}"
   end
 

@@ -13,5 +13,7 @@ Rails.application.routes.draw do
   post "demo/cycle", to: "demo#cycle", as: :demo_cycle
   post "demo/advance", to: "demo#advance", as: :demo_advance
 
+  mount MissionControl::Jobs::Engine, at: "/jobs" if defined?(MissionControl::Jobs::Engine)
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

@@ -36,6 +36,17 @@ http://localhost:3000
 
 The background worker must be running because event ingestion and cadence sweeps run asynchronously.
 
+### Watching the jobs
+
+The **Jobs** link in the header opens the Mission Control dashboard at
+`http://localhost:3000/jobs`: queues, workers and their heartbeats, finished and failed jobs with
+their arguments, and a **Run now** button for the recurring cadence sweep. It is the fastest way to
+see whether a sweep actually ran and what it was handed.
+
+The dashboard is open with no login. It is bundled for development only, so it is absent from any
+other environment rather than sitting there unauthenticated, and this app has no user model to
+authenticate it against.
+
 ## Demo Flow
 
 1. Open the **Triage** page.
