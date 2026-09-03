@@ -24,6 +24,9 @@
           <%= nav_link_to "Triage", root_path %>
           <%= nav_link_to "Drafts", messages_path %>
           <%= nav_link_to "Cadence", edit_cadence_path %>
+          <% if defined?(MissionControl::Jobs::Engine) %>
+            <%= nav_link_to "Jobs", mission_control_jobs_path, data: { turbo: false } %>
+          <% end %>
         </nav>
         <% if Clock.pinned? %>
           <span class="ml-auto rounded-full bg-accent-500 px-3 py-1 text-xs font-semibold text-ink"
