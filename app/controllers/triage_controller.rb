@@ -1,7 +1,7 @@
 class TriageController < ApplicationController
   def index
     @triage = @cadence.triage(now: now)
-    @queue = @triage.queue
-    @pending_count = @account.messages.pending.count
+    @candidates = @triage.candidates
+    @drafts = @triage.queue.select { |candidate| candidate.message.present? }
   end
 end

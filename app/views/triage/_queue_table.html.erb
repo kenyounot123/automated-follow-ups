@@ -1,0 +1,40 @@
+<table class="w-full text-sm">
+  <thead class="bg-brand-50 text-left text-xs font-semibold uppercase tracking-wide text-brand-800">
+    <tr>
+      <th class="px-4 py-3 font-medium">Quote</th>
+      <th class="px-4 py-3 font-medium">Customer</th>
+      <th class="px-4 py-3 text-right font-medium">Amount</th>
+      <th class="px-4 py-3 font-medium">Why</th>
+      <th class="px-4 py-3 font-medium">Next step</th>
+      <th class="px-4 py-3 font-medium">Last seen</th>
+      <th class="px-4 py-3 font-medium">Status</th>
+    </tr>
+  </thead>
+  <tbody class="divide-y divide-slate-100">
+    <% candidates.each do |candidate| %>
+      <% quote = candidate.quote %>
+      <tr class="hover:bg-slate-50">
+        <td class="px-4 py-3 font-medium">
+          <%= link_to quote.external_id, quote_path(quote), class: "font-semibold text-brand-600 hover:underline" %>
+        </td>
+        <td class="px-4 py-3"><%= quote.customer.name %><span class="text-ink-soft/60"> &middot; <%= quote.tech_name %></span></td>
+        <td class="px-4 py-3 text-right tabular-nums"><%= money(quote.amount_cents) %></td>
+        <td class="px-4 py-3"><%= reason_chip(candidate.reason) %></td>
+        <td class="px-4 py-3 text-ink-soft"><%= candidate.step.label %></td>
+        <td class="px-4 py-3 text-ink-soft">
+          <%= quote.last_viewed_at ? "viewed #{when_ago(quote.last_viewed_at)}" : "never viewed" %>
+        </td>
+        <td class="px-4 py-3 text-xs text-ink-soft">
+          <% if candidate.message %>
+            <%= link_to "Review →", messages_path, class: "font-semibold text-brand-600 hover:underline" %>
+          <% else %>
+            Not drafted
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+    <% if candidates.empty? %>
+      <tr><td colspan="7" class="px-4 py-8 text-center text-ink-soft"><%= empty_message %></td></tr>
+    <% end %>
+  </tbody>
+</table>

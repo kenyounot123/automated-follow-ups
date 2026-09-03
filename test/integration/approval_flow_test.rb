@@ -15,8 +15,9 @@ class ApprovalFlowTest < ActionDispatch::IntegrationTest
     assert_select "h1", /Follow-up triage/
     assert_match "Q-1026", response.body
     assert_match "viewed no reply", response.body
-    assert_no_match(/Q-1017/, response.body)
-    assert_no_match(/Q-1004/, response.body)
+    triage_text = css_select("#triage-candidates").first.text
+    assert_no_match(/Q-1017/, triage_text)
+    assert_no_match(/Q-1004/, triage_text)
   end
 
   test "triage shows quotes owed a human reply separately" do
@@ -24,6 +25,15 @@ class ApprovalFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h2", /Needs a human reply/
+  end
+
+  test "triage shows all activity in chronological order" do
+    get root_path
+
+    event_ids = css_select("#activity-timeline > li").map { |node| node["data-event-id"] }
+
+    assert_equal @account.events.count, event_ids.size
+    assert_equal @account.events.chronological.pluck(:external_event_id), event_ids
   end
 
   test "drafting is idempotent" do
