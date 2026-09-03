@@ -1,5 +1,8 @@
-# Automated Follow-Up
+[2026-09-03-robby-take-home.txt](https://github.com/user-attachments/files/31809073/2026-09-03-robby-take-home.txt)# Automated Follow-Up
 Check out the loom video below for a more visual demo
+
+### AI Convo
+This is exported as txt in the repo as well.
 
 ## Running the Demo Locally
 
